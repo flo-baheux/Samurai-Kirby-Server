@@ -1,5 +1,4 @@
 #include <iostream>
-#include <format>
 #include <chrono>
 #include <thread>
 #include <random>
@@ -34,7 +33,7 @@ static int getRandomValueInRange(int minInclusive, int maxInclusive)
 GameplayRoom::GameplayRoom(GameDifficulty difficulty)
     : difficulty{difficulty}
 {
-  gameplayThread = std::thread(&handleGameplay, this);
+  gameplayThread = std::thread(&GameplayRoom::handleGameplay, this);
 }
 
 bool GameplayRoom::addPlayer(ConnectedClient *player)
@@ -46,24 +45,24 @@ bool GameplayRoom::addPlayer(ConnectedClient *player)
   {
     player1 = player;
     player1->sendMessage("player1");
-    broadcastToPlayers(std::format("player1:joined-{}", std::string(player1->getNickname())));
+    broadcastToPlayers("player1:joined-" + std::string(player1->getNickname()));
     if (player2 != nullptr)
     {
       // catchup message on join
-      player1->sendMessage(std::format("player2:joined-{}", std::string(player2->getNickname())));
-      player1->sendMessage(std::format("player2:{}", player2->isPlayerReady() ? "ready" : "unready"));
+      player1->sendMessage("player2:joined-" + std::string(player2->getNickname()));
+      player1->sendMessage(std::string("player2:") + (player2->isPlayerReady() ? "ready" : "unready"));
     }
   }
   else if (player2 == nullptr)
   {
     player2 = player;
     player2->sendMessage("player2");
-    broadcastToPlayers(std::format("player2:joined-{}", std::string(player2->getNickname())));
+    broadcastToPlayers("player2:joined-" + std::string(player2->getNickname()));
     if (player1 != nullptr)
     {
       // catchup message on join
-      player2->sendMessage(std::format("player1:joined-{}", std::string(player1->getNickname())));
-      player2->sendMessage(std::format("player1:{}", player1->isPlayerReady() ? "ready" : "unready"));
+      player2->sendMessage("player1:joined-" + std::string(player1->getNickname()));
+      player2->sendMessage(std::string("player1:") + (player1->isPlayerReady() ? "ready" : "unready"));
     }
   }
   return true;
@@ -126,14 +125,14 @@ void GameplayRoom::handleGameplay()
 void GameplayRoom::playerNotifyReadyStatus(ConnectedClient *player, bool isReady)
 {
   if (gameState == WAITING_PLAYERS)
-    broadcastToPlayers(std::format("player{}:{}", player == player1 ? "1" : "2", isReady ? "ready" : "unready"));
+    broadcastToPlayers(std::string("player") + (player == player1 ? "1" : "2") + ":" + (isReady ? "ready" : "unready"));
 }
 
 void GameplayRoom::playerNotifyWantsToReplay(ConnectedClient *player)
 {
   if (gameState == OVER)
   {
-    broadcastToPlayers(std::format("player{}:replay", player == player1 ? "1" : "2"));
+    broadcastToPlayers(std::string("player") + (player == player1 ? "1" : "2") + ":replay");
   }
 }
 
@@ -173,12 +172,16 @@ void GameplayRoom::playerNotifyPressedButton(ConnectedClient *player)
     if (player == player1)
     {
       player1PressedAt = getTimerNow();
-      broadcastToPlayers(std::format("player1:fail-{}", player->getButtonPressed()));
+      std::string messageToSend =std::string("player1:fail-");
+      messageToSend += player->getButtonPressed();
+      broadcastToPlayers(messageToSend);
     }
     else if (player == player2)
     {
       player2PressedAt = getTimerNow();
-      broadcastToPlayers(std::format("player2:fail-{}", player->getButtonPressed()));
+      std::string messageToSend =std::string("player2:fail-");
+      messageToSend += player->getButtonPressed();
+      broadcastToPlayers(messageToSend);
     }
   }
 }
@@ -228,7 +231,9 @@ void GameplayRoom::handleEveryoneCanPlay()
     gameState = STARTED;
     gameStartedAt = getTimerNow();
     buttonToPress = getRandomButtonToPress();
-    broadcastToPlayers(std::format("startGame-{}", buttonToPress));
+    std::string messageToSend = std::string("startGame-");
+    messageToSend.push_back(buttonToPress);
+    broadcastToPlayers(messageToSend);
   }
 }
 
@@ -255,7 +260,7 @@ void GameplayRoom::handleOnePlayerPlayedTimeout()
       int timeSincePlayerPlayed = getTimeBetween<std::chrono::seconds>(player1PressedAt, getTimerNow());
       if (timeSincePlayerPlayed >= ONE_PLAYER_ONLY_TIMEOUT_S)
       {
-        broadcastToPlayers(std::format("player1:win-{}", player1->getTimer()));
+        broadcastToPlayers("player1:win-" + std::to_string(player1->getTimer()));
         gameState = OVER;
       }
     }
@@ -266,7 +271,7 @@ void GameplayRoom::handleOnePlayerPlayedTimeout()
 
       if (timeSincePlayerPlayed >= ONE_PLAYER_ONLY_TIMEOUT_S)
       {
-        broadcastToPlayers(std::format("player2:win-{}", player2->getTimer()));
+        broadcastToPlayers("player2:win-" + std::to_string(player2->getTimer()));
         gameState = OVER;
       }
     }
@@ -281,11 +286,11 @@ void GameplayRoom::handleEveryonePlayed()
     int player2Timer = player2->getTimer();
     if (player1Timer < player2Timer && player1->getButtonPressed() == buttonToPress)
     {
-      broadcastToPlayers(std::format("player1:win-{}", player1Timer));
+      broadcastToPlayers("player1:win-" + std::to_string(player1Timer));
     }
     else if (player1Timer > player2Timer && player2->getButtonPressed() == buttonToPress)
     {
-      broadcastToPlayers(std::format("player2:win-{}", player2Timer));
+      broadcastToPlayers("player2:win-" + std::to_string(player2Timer));
     }
     else
     {
@@ -304,6 +309,9 @@ void GameplayRoom::handleReplay()
     buttonToPress = '\0';
     player1->resetGameData();
     player2->resetGameData();
+    gameStartedAt = std::chrono::system_clock::time_point::min();
+    player1PressedAt = std::chrono::system_clock::time_point::min();
+    player2PressedAt = std::chrono::system_clock::time_point::min();
     broadcastToPlayers("replay");
   }
 }

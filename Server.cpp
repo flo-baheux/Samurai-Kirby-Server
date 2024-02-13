@@ -133,7 +133,7 @@ int Server::serverListen(int port)
 void Server::handleNewClientConnection()
 {
   int clientSocket{};
-  int clientAddrLen{};
+  socklen_t clientAddrLen{};
   struct sockaddr_in clientAddr
   {
   };

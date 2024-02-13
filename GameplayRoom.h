@@ -38,7 +38,7 @@ private:
     OVER,
   };
 
-  static const int NO_INPUT_TIMEOUT_S{3};
+  static const int NO_INPUT_TIMEOUT_S{5};
   static const int ONE_PLAYER_ONLY_TIMEOUT_S{1};
 
   ConnectedClient *player1{nullptr};

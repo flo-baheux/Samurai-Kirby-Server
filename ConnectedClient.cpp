@@ -7,7 +7,6 @@
 #endif
 
 #include <iostream>
-#include <format>
 
 #include "ConnectedClient.h"
 
@@ -16,8 +15,8 @@ const int BUFFER_SIZE = 1024;
 ConnectedClient::ConnectedClient(ClientConnectionInfo clientConnectionInfo, RoomsManager *roomManager)
     : clientConnectionInfo{clientConnectionInfo}, roomManager{roomManager}, room{nullptr}
 {
-  receiveThread = std::thread(&receiveFromClient, this);
-  sendThread = std::thread(&sendToClient, this);
+  receiveThread = std::thread(&ConnectedClient::receiveFromClient, this);
+  sendThread = std::thread(&ConnectedClient::sendToClient, this);
 };
 
 int ConnectedClient::getSocket() const
@@ -51,7 +50,7 @@ void ConnectedClient::receiveFromClient()
   {
     std::string message(buffer, bytesRead);
 
-    std::cout << std::format("Received [{}]", message) << std::endl;
+    std::cout << "Received [" << message << "]" << std::endl;
     if (message.find("join:") != std::string::npos)
     {
       nickname = message.substr(message.find(':') + 1);
@@ -86,6 +85,11 @@ void ConnectedClient::receiveFromClient()
     {
       wantsToReplay = true;
     }
+    else if (message.find("leaveRoom") != std::string::npos)
+    {
+      room->playerNotifyDisconnect(this);
+      
+    }
   }
 
   if (bytesRead == 0)
@@ -93,7 +97,7 @@ void ConnectedClient::receiveFromClient()
     // Connection closed by the client
     std::cout << "Connection closed by client" << std::endl;
   }
-  else if (bytesRead == SOCKET_ERROR)
+  else if (bytesRead == -1)
   {
     perror("Error receiving data");
 #ifdef _WIN32

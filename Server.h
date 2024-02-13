@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <cerrno>
+#include <string.h>
 #endif
 
 #include "RoomsManager.h"
