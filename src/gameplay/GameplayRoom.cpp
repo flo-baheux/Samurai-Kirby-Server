@@ -111,9 +111,9 @@ void GameplayRoom::handleGameplay()
       handleEveryoneCanPlay();
       break;
     case STARTED:
-      handleTimeout();
-      handleOnePlayerPlayedTimeout();
+      handleOnePlayerPlayed();
       handleEveryonePlayed();
+      handleTimeout();
       break;
     case OVER:
       handleReplay();
@@ -151,6 +151,21 @@ void GameplayRoom::playerNotifyDisconnect(ConnectedClient *player)
   }
 }
 
+void GameplayRoom::playerNotifyLeftRoom(ConnectedClient *player)
+{
+  gameState = WAITING_PLAYERS;
+  if (player == player1)
+  {
+    player1 = nullptr;
+    broadcastToPlayers("player1:left");
+  }
+  else if (player == player2)
+  {
+    player2 = nullptr;
+    broadcastToPlayers("player2:left");
+  }
+}
+
 // It is important to not determine who wins here
 // second player to notify could be the winner and notify later because of network latency
 void GameplayRoom::playerNotifyPressedButton(ConnectedClient *player)
@@ -164,25 +179,6 @@ void GameplayRoom::playerNotifyPressedButton(ConnectedClient *player)
   else if (player == player2)
   {
     player2PressedAt = getTimerNow();
-  }
-
-  if ((gameState == CAN_START || gameState == STARTED) && (buttonToPress == '\0' || player->getButtonPressed() != buttonToPress))
-  {
-    gameState = OVER;
-    if (player == player1)
-    {
-      player1PressedAt = getTimerNow();
-      std::string messageToSend =std::string("player1:fail-");
-      messageToSend += player->getButtonPressed();
-      broadcastToPlayers(messageToSend);
-    }
-    else if (player == player2)
-    {
-      player2PressedAt = getTimerNow();
-      std::string messageToSend =std::string("player2:fail-");
-      messageToSend += player->getButtonPressed();
-      broadcastToPlayers(messageToSend);
-    }
   }
 }
 
@@ -244,37 +240,62 @@ void GameplayRoom::handleTimeout()
     int timeSinceGameStarted = getTimeBetween<std::chrono::seconds>(gameStartedAt, getTimerNow());
     if (timeSinceGameStarted >= NO_INPUT_TIMEOUT_S)
     {
-
       broadcastToPlayers("draw");
       gameState = OVER;
     }
   }
 }
 
-void GameplayRoom::handleOnePlayerPlayedTimeout()
+// If one player played and it's the wrong button, end of the game
+// If one player played only, check for timeout
+void GameplayRoom::handleOnePlayerPlayed()
 {
-  if (gameState == STARTED && !everyonePlayed())
+  if ((gameState != CAN_START && gameState != STARTED) || everyonePlayed())
   {
-    if (!isTimePointAtDefault(player1PressedAt) && isTimePointAtDefault(player2PressedAt))
-    {
-      int timeSincePlayerPlayed = getTimeBetween<std::chrono::seconds>(player1PressedAt, getTimerNow());
-      if (timeSincePlayerPlayed >= ONE_PLAYER_ONLY_TIMEOUT_S)
-      {
-        broadcastToPlayers("player1:win-" + std::to_string(player1->getTimer()));
-        gameState = OVER;
-      }
-    }
+    return;
+  }
 
-    if (isTimePointAtDefault(player1PressedAt) && !isTimePointAtDefault(player2PressedAt))
-    {
-      int timeSincePlayerPlayed = getTimeBetween<std::chrono::seconds>(player2PressedAt, getTimerNow());
+  // Either no-one played or only one played
+  ConnectedClient *playerWhoPlayed = nullptr;
+  if (!isTimePointAtDefault(player1PressedAt) && isTimePointAtDefault(player2PressedAt))
+  {
+    playerWhoPlayed = player1;
+  }
+  else if (isTimePointAtDefault(player1PressedAt) && !isTimePointAtDefault(player2PressedAt))
+  {
+    playerWhoPlayed = player2;
+  }
 
-      if (timeSincePlayerPlayed >= ONE_PLAYER_ONLY_TIMEOUT_S)
-      {
-        broadcastToPlayers("player2:win-" + std::to_string(player2->getTimer()));
-        gameState = OVER;
-      }
-    }
+  // No player played // COULD WIDELY SIMPLIFY
+  if (playerWhoPlayed == nullptr)
+  {
+    return;
+  }
+
+  // game is not started yet
+  if (gameState != STARTED)
+  {
+    gameState = OVER;
+    // player pressed to early - failed
+    broadcastToPlayers(buildGameResultDTO(playerWhoPlayed == player1 ? 2 : 1).serialize());
+    return;
+  }
+
+  // pressed the wrong button
+  if (playerWhoPlayed->getButtonPressed() != buttonToPress)
+  {
+    gameState = OVER;
+    // NOTIFY CLIENT PLAYER FAILED - TOO EARLY OR WRONG BUTTON
+    broadcastToPlayers(buildGameResultDTO(playerWhoPlayed == player1 ? 2 : 1).serialize());
+    return;
+  }
+
+  // one player played, game is started, pressed the correct button... check for timeout
+  int timeSincePlayerPlayed = getTimeBetween<std::chrono::seconds>(playerWhoPlayed == player1 ? player1PressedAt : player2PressedAt, getTimerNow());
+  if (timeSincePlayerPlayed >= ONE_PLAYER_ONLY_TIMEOUT_S)
+  {
+    gameState = OVER;
+    broadcastToPlayers(buildGameResultDTO(playerWhoPlayed == player1 ? 1 : 2).serialize());
   }
 }
 
@@ -286,15 +307,16 @@ void GameplayRoom::handleEveryonePlayed()
     int player2Timer = player2->getTimer();
     if (player1Timer < player2Timer && player1->getButtonPressed() == buttonToPress)
     {
-      broadcastToPlayers("player1:win-" + std::to_string(player1Timer));
+      broadcastToPlayers(buildGameResultDTO(1).serialize());
     }
     else if (player1Timer > player2Timer && player2->getButtonPressed() == buttonToPress)
     {
-      broadcastToPlayers("player2:win-" + std::to_string(player2Timer));
+      broadcastToPlayers(buildGameResultDTO(1).serialize());
     }
     else
     {
-      broadcastToPlayers("draw:");
+      // draw
+      broadcastToPlayers(buildGameResultDTO(0).serialize());
     }
 
     gameState = OVER;
@@ -326,4 +348,12 @@ GameplayRoom::~GameplayRoom()
   stopThreads = true;
   if (gameplayThread.joinable())
     gameplayThread.join();
+}
+
+GameplayRoom::GameResultDTO GameplayRoom::buildGameResultDTO(int winningPlayerNb)
+{
+  return {
+      player1->getButtonPressed(), player1->getTimer(), 0,
+      player2->getButtonPressed(), player2->getTimer(), 0,
+      winningPlayerNb};
 }

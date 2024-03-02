@@ -2,6 +2,7 @@
 #define GAMEPLAYROOM_H
 
 #include <thread>
+#include <sstream>
 
 #include "ConnectedClient.h"
 #include "GameDifficulty.h"
@@ -19,6 +20,7 @@ public:
   void playerNotifyReadyStatus(ConnectedClient *, bool isReady);
   void playerNotifyWantsToReplay(ConnectedClient *player);
   void playerNotifyDisconnect(ConnectedClient *player);
+  void playerNotifyLeftRoom(ConnectedClient *player);
   void playerNotifyPressedButton(ConnectedClient *player);
 
   GameDifficulty getRoomDifficulty() const;
@@ -60,14 +62,53 @@ private:
   void broadcastToPlayers(const std::string &message);
   char getRandomButtonToPress() const;
 
-  bool gameReachedTimeout();
-
   void handleEveryoneReady();
   void handleEveryoneCanPlay();
   void handleTimeout();
-  void handleOnePlayerPlayedTimeout();
+  void handleOnePlayerPlayed();
   void handleEveryonePlayed();
   void handleReplay();
+
+  class GameResultDTO
+  {
+    char player1ButtonPressed;
+    int player1PressedInMs;
+    int player1TotalWins;
+    char player2ButtonPressed;
+    int player2PressedInMs;
+    int player2TotalWins;
+    int winningPlayer; // 1 or 2
+
+  public:
+    GameResultDTO(
+        char player1ButtonPressed,
+        int player1PressedInMs,
+        int player1TotalWins,
+        char player2ButtonPressed,
+        int player2PressedInMs,
+        int player2TotalWins,
+        int winningPlayer) : player1ButtonPressed{player1ButtonPressed},
+                             player1PressedInMs{player1PressedInMs},
+                             player1TotalWins{player1TotalWins},
+                             player2ButtonPressed{player2ButtonPressed},
+                             player2PressedInMs{player2PressedInMs},
+                             player2TotalWins{player2TotalWins},
+                             winningPlayer{winningPlayer} {};
+
+    std::string serialize()
+    {
+      std::ostringstream serializedStream;
+
+      serializedStream << "gameResult-"
+                       << player1ButtonPressed << "," << player1PressedInMs << "," << player1TotalWins << ";"
+                       << player2ButtonPressed << "," << player2PressedInMs << "," << player2TotalWins << ";"
+                       << "player" << winningPlayer;
+
+      return serializedStream.str();
+    };
+  };
+
+  GameResultDTO buildGameResultDTO(int winningPlayerNb);
 };
 
 #endif

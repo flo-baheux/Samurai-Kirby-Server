@@ -41,12 +41,10 @@ void RoomsManager::deleteEmptyRooms()
   {
     if ((*iterator)->isEmpty())
     {
-      std::cout << "found one!" << std::endl;
 
       delete *iterator;
-      std::cout << "deleted one!" << std::endl;
-
       iterator = rooms.erase(iterator);
+      std::cout << "deleted a room!" << std::endl;
     }
     else
     {
