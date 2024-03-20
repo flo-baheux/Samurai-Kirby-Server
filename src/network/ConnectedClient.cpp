@@ -6,21 +6,27 @@
 #include <sys/socket.h>
 #endif
 
+#include <format>
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 
 #include "ConnectedClient.h"
 #include "GameDifficulty.h"
+#include "Serializer.h"
 
 const int BUFFER_SIZE = 1024;
 
-ConnectedClient::ConnectedClient(std::unique_ptr<ClientSocket> clientSocket, std::unique_ptr<NetworkEventBroker> eventBroker, int id)
+ConnectedClient::ConnectedClient(std::unique_ptr<ClientSocket> clientSocket, NetworkMessageBroker &messageBroker, int id)
     : clientSocket{std::move(clientSocket)},
-      eventBroker{std::move(eventBroker)},
+      messageBroker{messageBroker},
       id{id}
 {
-  eventBroker->publishPlayerConnectivityEvent(PlayerConnectEvent{id});
+  ConnectedClient::messageBroker.publishPlayerConnectivityMessage(PlayerConnectivityMessage{CONNECT, id});
+  ConnectedClient::messageBroker.subscribeToGameplayMessagesForPlayer(
+      id,
+      [this](std::shared_ptr<GameplayMessage> message)
+      { handleGameplayMessage(message); });
 };
 
 char *ConnectedClient::getIP() const
@@ -53,77 +59,52 @@ void ConnectedClient::receiveFromNetwork()
     {
       std::string arguments = message.substr(message.find(":") + 1);
       int separatorIndex = arguments.find(",");
-      std::string nickname = arguments.substr(0, separatorIndex - 1);
+      std::string nickname = arguments.substr(0, separatorIndex);
       std::string difficultyAsString = arguments.substr(separatorIndex + 1);
+      // TODO: Send as enum
       std::transform(difficultyAsString.begin(), difficultyAsString.end(), difficultyAsString.begin(), [](unsigned char c)
                      { return std::tolower(c); });
-
-      // WARNING: This is NOT SAFE AT ALL - ok for now until the game works
-      GameDifficulty difficulty = gameDifficultyStringToEnum.find(difficultyAsString)->second;
-      eventBroker->publishPlayerActionEvent(id, JoinGamePlayerActionEvent(nickname, difficulty));
+      GameDifficulty difficulty = gameDifficultyStringToEnum.at(difficultyAsString);
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<JoinGamePlayerActionMessage>(nickname, difficulty));
     }
     else if (message.find("unready") != std::string::npos)
     {
-      eventBroker->publishPlayerActionEvent(id, SetReadyStatePlayerActionEvent(false));
-      // room->playerNotifyReadyStatus(this, isReady);
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<SetReadyStatePlayerActionMessage>(false));
     }
     else if (message.find("ready") != std::string::npos)
     {
-      eventBroker->publishPlayerActionEvent(id, SetReadyStatePlayerActionEvent(true));
-      // room->playerNotifyReadyStatus(this, isReady);
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<SetReadyStatePlayerActionMessage>(true));
     }
     else if (message.find("canPlay") != std::string::npos)
     {
-      eventBroker->publishPlayerActionEvent(id, SetReadyStatePlayerActionEvent(true));
-      // canPlay = true;
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<NotifyCanPlayPlayerActionMessage>());
     }
     else if (message.find("pressedButton:") != std::string::npos)
     {
-      char buttonPressedAsChar = std::toupper(message.substr(message.find(':') + 1, 1)[0]);
+      int buttonPressedEnumValueAsInt = std::stoi(message.substr(message.find(':') + 1, 1));
       int timeToPress = std::stoi(message.substr(message.find(",") + 1));
-      ButtonPressed buttonPressed;
-      switch (buttonPressedAsChar)
-      {
-      case 'A':
-        buttonPressed = ButtonPressed::A;
-      case 'B':
-        buttonPressed = ButtonPressed::B;
-      case 'X':
-        buttonPressed = ButtonPressed::X;
-      case 'Y':
-        buttonPressed = ButtonPressed::Y;
-      }
-      eventBroker->publishPlayerActionEvent(id, PressedButtonPlayerActionEvent(buttonPressed, timeToPress));
-
-      //   // Only works the first time this event is received
-      //   if (timer == 0)
-      //   {
-      //     buttonPressed = message.substr(message.find(':') + 1, 1)[0];
-      //     timer = std::stoi(message.substr(message.find(",") + 1));
-      //     room->playerNotifyPressedButton(this);
-      //   }
+      GameplayInput buttonPressed = (GameplayInput)buttonPressedEnumValueAsInt;
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<InputPlayerActionMessage>(buttonPressed, timeToPress));
     }
     else if (message.find("wantsToReplay") != std::string::npos)
     {
-      // wantsToReplay = true;
-      eventBroker->publishPlayerActionEvent(id, SetReplayReadyStatePlayerActionEvent(true));
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<SetReplayReadyStatePlayerActionMessage>(true));
     }
     else if (message.find("leave") != std::string::npos)
     {
-      eventBroker->publishPlayerActionEvent(id, LeaveGamePlayerActionEvent());
+      messageBroker.publishPlayerActionMessage(id, std::make_shared<LeaveGamePlayerActionMessage>());
     }
     else if (message.find("disconnect") != std::string::npos)
     {
-      eventBroker->publishPlayerConnectivityEvent(PlayerConnectEvent{id});
+      messageBroker.publishPlayerConnectivityMessage(PlayerConnectivityMessage{DISCONNECT, id});
     }
   }
 
   if (bytesRead == 0)
   {
-    // Connection closed by the client
     std::cout << "Connection closed by client" << std::endl;
     hasBeenDisconnected = true;
-    eventBroker->publishPlayerConnectivityEvent(PlayerConnectEvent{id});
+    messageBroker.publishPlayerConnectivityMessage(PlayerConnectivityMessage{DISCONNECT, id});
   }
 
   else if (bytesRead == -1)
@@ -132,14 +113,14 @@ void ConnectedClient::receiveFromNetwork()
     int error = WSAGetLastError();
     if (error != WSAEWOULDBLOCK)
     {
-      eventBroker->publishPlayerConnectivityEvent(PlayerConnectEvent{id});
+      messageBroker.publishPlayerConnectivityMessage(PlayerConnectivityMessage{DISCONNECT, id});
 
       throw std::runtime_error("Failed to receive data. WSA Error " + error);
     }
 #else
     if (errno != EWOULDBLOCK && errno != EAGAIN)
     {
-      eventBroker->publishPlayerConnectivityEvent(PlayerConnectEvent{id});
+      messageBroker.publishPlayerConnectivityMessage(PlayerConnectMessage{id});
 
       throw std::runtime_error("Failed to receive data");
     }
@@ -147,52 +128,13 @@ void ConnectedClient::receiveFromNetwork()
   }
 }
 
-void ConnectedClient::sendToNetwork()
+void ConnectedClient::handleGameplayMessage(std::shared_ptr<GameplayMessage> message)
 {
-  std::vector<GameplayEvent> events = eventBroker->receiveGameplayEvents(id);
-
-  for (GameplayEvent &e : events)
+  if (!isDisconnected())
   {
-    std::string message = "TOTO";
-    std::cout << "Sending [" << message << "]" << std::endl;
-    message += "\n";
-    clientSocket->send(message);
+    clientSocket->send(Serializer::serialize(*message));
   }
 }
-
-// bool ConnectedClient::isPlayerReady() const
-// {
-//   return isReady;
-// }
-
-// bool ConnectedClient::playerCanPlay() const
-// {
-//   return canPlay;
-// }
-
-// int ConnectedClient::getTimer() const
-// {
-//   return timer;
-// }
-
-// char ConnectedClient::getButtonPressed() const
-// {
-//   return buttonPressed;
-// }
-
-// bool ConnectedClient::playerWantsToReplay() const
-// {
-//   return wantsToReplay;
-// }
-
-// void ConnectedClient::resetGameData()
-// {
-//   isReady = true;
-//   canPlay = false;
-//   wantsToReplay = false;
-//   timer = 0;
-//   buttonPressed = '\0';
-// }
 
 bool ConnectedClient::isDisconnected() const
 {

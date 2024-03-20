@@ -12,10 +12,12 @@
 #include <cerrno>
 #endif
 #include <optional>
+#include <memory>
 
 #include "ServerSocket.h"
 #include "ConnectedClient.h"
-#include "EventHub.h"
+#include "MessageHub.h"
+#include "Gameplay.h"
 
 class Server
 {
@@ -29,9 +31,12 @@ public:
   void start(int port);
 
 private:
+  std::unique_ptr<Gameplay> gameplay;
+
   int nextClientId = 0;
 
-  EventHub eventHub;
+  MessageHub messageHub;
+  std::unique_ptr<NetworkMessageBroker> messageBroker;
 
   std::unique_ptr<ServerSocket> serverSocket{nullptr};
   std::vector<std::unique_ptr<ConnectedClient>> connectedClients{};

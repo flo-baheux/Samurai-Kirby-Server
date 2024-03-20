@@ -350,7 +350,7 @@ GameplayRoom::~GameplayRoom()
     gameplayThread.join();
 }
 
-GameplayRoom::GameResultDTO GameplayRoom::buildGameResultDTO(int winningPlayerNb)
+GameplayGameResultDTO GameplayRoom::buildGameResultDTO(int winningPlayerNb)
 {
   return {
       player1->getButtonPressed(), player1->getTimer(), 0,

@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic
+CXXFLAGS := -std=c++20 -Wall -Wextra -pedantic
 DEBUGFLAGS := -g
 
 
@@ -11,7 +11,7 @@ endif
 SRC_DIR := ./src
 BUILD_DIR := ./build
 INCLUDE_DIR := $(shell find $(SRC_DIR) -type d)
-INCLUDE_FLAG := $(addprefix -I,$(INCLUDE_DIR))
+INCLUDE_FLAG := $(addprefix -I,$(INCLUDE_DIR)) -I./include
 
 SRCS := $(shell find $(SRC_DIR) -type f -name '*.cpp')
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))

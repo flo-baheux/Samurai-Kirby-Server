@@ -7,7 +7,7 @@ ClientSocket::ClientSocket(SOCKET socket, sockaddr_in addr) : _socket{socket}, a
 
   // On Windows, client socket IO is inherited from server socket
   // On UNIX, client socket IO is not inherited but rather set as blocking by default
-  // To prevent any confusion we set the socket anyway
+  // To prmessage any confusion we set the socket anyway
 #ifdef _WIN32
   u_long mode = 1; // non-zero value for non-blocking mode
   if (ioctlsocket(socket, FIONBIO, &mode) != 0)
@@ -35,7 +35,6 @@ ClientSocket::~ClientSocket()
 {
 #ifdef _WIN32
   closesocket(_socket);
-  WSACleanup();
 #else
   close(_socket);
 #endif
@@ -58,5 +57,6 @@ SOCKET ClientSocket::getInternalSocket()
 
 void ClientSocket::send(const std::string message)
 {
-  ::send(_socket, message.c_str(), message.length(), 0);
+  const std::string messageWithSeparator = message + "\n";
+  ::send(_socket, messageWithSeparator.c_str(), messageWithSeparator.length(), 0);
 };

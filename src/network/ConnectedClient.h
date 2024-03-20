@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "ClientSocket.h"
-#include "NetworkEventBroker.h"
+#include "NetworkMessageBroker.h"
 
 class RoomsManager;
 class GameplayRoom;
@@ -12,7 +12,7 @@ class GameplayRoom;
 class ConnectedClient
 {
 public:
-  ConnectedClient(std::unique_ptr<ClientSocket>, std::unique_ptr<NetworkEventBroker>, int id);
+  ConnectedClient(std::unique_ptr<ClientSocket>, NetworkMessageBroker &, int id);
   ~ConnectedClient(){};
 
   ConnectedClient() = delete;
@@ -26,12 +26,12 @@ public:
   void sendMessage(const std::string &message);
 
   void receiveFromNetwork();
-  void sendToNetwork();
+  void handleGameplayMessage(std::shared_ptr<GameplayMessage>);
   bool isDisconnected() const;
 
 private:
   std::unique_ptr<ClientSocket> clientSocket;
-  std::unique_ptr<NetworkEventBroker> eventBroker;
+  NetworkMessageBroker &messageBroker;
 
   bool hasBeenDisconnected{false};
 

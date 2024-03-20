@@ -2,13 +2,13 @@
 #define GAMEPLAY_H
 
 #include <memory>
-#include "GameplayEventBroker.h"
+#include "GameplayMessageBroker.h"
+#include "Room.h"
 
 class Gameplay
 {
 public:
-  Gameplay(std::unique_ptr<GameplayEventBroker> eventBroker)
-      : eventBroker{std::move(eventBroker)} {};
+  Gameplay(std::unique_ptr<GameplayMessageBroker> messageBroker);
   ~Gameplay(){};
 
   Gameplay(const Gameplay &) = delete;
@@ -16,10 +16,16 @@ public:
 
   void start();
 
-private:
-  std::unique_ptr<GameplayEventBroker> eventBroker;
+  void handlePlayerMessages(int playerId, std::shared_ptr<PlayerActionMessage> message);
 
-  std::vector<Player *> players;
+private:
+  std::unique_ptr<GameplayMessageBroker> messageBroker;
+
+  void handlePlayerConnectivityMessage(PlayerConnectivityMessage message);
+  void handlePlayerJoinMessage(int playerId, std::shared_ptr<JoinGamePlayerActionMessage> message);
+
+  std::vector<int> playerIds;
+  std::vector<std::unique_ptr<Room>> rooms;
 };
 
 #endif // GAMEPLAY_H

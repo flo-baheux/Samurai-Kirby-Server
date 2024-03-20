@@ -2,10 +2,13 @@
 #include <algorithm>
 
 #include "Server.h"
+#include <thread>
 
 Server::Server()
 {
   initNetwork();
+  gameplay = std::make_unique<Gameplay>(std::make_unique<GameplayMessageBroker>(messageHub));
+  messageBroker = std::make_unique<NetworkMessageBroker>(messageHub);
 };
 
 void Server::initNetwork()
@@ -21,8 +24,11 @@ void Server::initNetwork()
 
 void Server::start(int port)
 {
-  serverSocket = std::make_unique<ServerSocket>(port, NON_BLOCKING);
+  serverSocket = std::make_unique<ServerSocket>(port);
   std::cout << "Server listening on port " << port << std::endl;
+
+  std::thread t([this]()
+                { gameplay->start(); });
 
   while (true)
   {
@@ -31,7 +37,7 @@ void Server::start(int port)
       handleNewClientConnection();
       handleClientsCommunication();
     }
-    catch (std::exception e)
+    catch (std::runtime_error e)
     {
       std::cerr << e.what() << std::endl;
     }
@@ -47,19 +53,23 @@ void Server::handleNewClientConnection()
     return;
   }
 
-  ConnectedClient *client = new ConnectedClient{std::move(clientSocket.value()), std::make_unique<NetworkEventHub>(eventHub), nextClientId++};
-  connectedClients.push_back(client);
+  std::unique_ptr<ConnectedClient> client = std::make_unique<ConnectedClient>(
+      std::move(clientSocket.value()),
+      *messageBroker,
+      nextClientId++);
 
   std::cout << "Connection accepted from " << client->getIP() << ":" << client->getPort() << std::endl;
+
+  connectedClients.push_back(std::move(client));
 };
 
 void Server::handleClientsCommunication()
 {
   for (auto it = connectedClients.begin(); it != connectedClients.end();)
   {
-    ConnectedClient *client = *it;
+    std::unique_ptr<ConnectedClient> &client = *it;
     client->receiveFromNetwork();
-    client->sendToNetwork();
+    messageBroker->dispatchMessages();
     it = client->isDisconnected() ? connectedClients.erase(it) : std::next(it);
   }
 }
@@ -74,10 +84,9 @@ std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection()
 
   if ((socket = accept(serverSocket->getInternalSocket(), (struct sockaddr *)&clientAddr, &clientAddrLen)) == -1)
   {
-    SOCKET_IO serverSocketIOType = serverSocket->getSocketIOType();
 #ifdef _WIN32
     int error = WSAGetLastError();
-    if ((serverSocketIOType == BLOCKING) || (serverSocketIOType == NON_BLOCKING && error != WSAEWOULDBLOCK))
+    if (error != WSAEWOULDBLOCK)
     {
       throw std::runtime_error("Failed to accept connection. WSA Error " + error);
     }
@@ -86,15 +95,15 @@ std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection()
       return std::nullopt;
     }
 #else
-    if ((serverSocketIOType == BLOCKING) || (serverSocketIOType == NON_BLOCKING && !(errno == EWOULDBLOCK || errno == EAGAIN)))
-    {
-      throw std::runtime_error("Failed to accept connection");
-    }
+    if (errno != EWOULDBLOCK && errno != EAGAIN))
+      {
+        throw std::runtime_error("Failed to accept connection");
+      }
     else
     {
       return std::nullopt;
     }
 #endif
   }
-  return std::make_unique<ClientSocket>(socket, clientAddr, NON_BLOCKING);
+  return std::make_unique<ClientSocket>(socket, clientAddr);
 }
