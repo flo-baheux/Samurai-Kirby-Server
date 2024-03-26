@@ -23,7 +23,7 @@ class Server
 {
 public:
   Server();
-  ~Server(){};
+  ~Server() {};
 
   Server(const Server &) = delete;
   Server &operator=(const Server &) = delete;
@@ -38,7 +38,7 @@ private:
   MessageHub messageHub;
   std::unique_ptr<NetworkMessageBroker> messageBroker;
 
-  std::unique_ptr<ServerSocket> serverSocket{nullptr};
+  std::unique_ptr<ServerSocket> serverSocket{ nullptr };
   std::vector<std::unique_ptr<ConnectedClient>> connectedClients{};
 
   /**

@@ -8,8 +8,7 @@
 #include "GameDifficulty.h"
 #include "GameplayInput.h"
 
-enum PlayerActionMessageType
-{
+enum PlayerActionMessageType {
   JOIN_GAME,
   SET_READY_STATE,
   NOTIFY_CAN_PLAY,
@@ -18,73 +17,66 @@ enum PlayerActionMessageType
   LEAVE_GAME,
 };
 
-class PlayerActionMessage
-{
+class PlayerActionMessage {
 protected:
   explicit PlayerActionMessage(PlayerActionMessageType messageType)
-      : messageType{messageType} {};
+    : messageType{messageType} {};
 
 public:
-  virtual ~PlayerActionMessage(){};
+  virtual ~PlayerActionMessage() {};
   const PlayerActionMessageType messageType;
 };
 
-class JoinGamePlayerActionMessage : public PlayerActionMessage
-{
+class JoinGamePlayerActionMessage : public PlayerActionMessage {
 public:
   JoinGamePlayerActionMessage(std::string nickname, GameDifficulty gameDifficulty)
-      : PlayerActionMessage(JOIN_GAME),
-        nickname{nickname},
-        gameDifficulty{gameDifficulty} {};
+    : PlayerActionMessage(JOIN_GAME),
+    nickname{nickname},
+    gameDifficulty{gameDifficulty} {};
 
   const std::string nickname;
   const GameDifficulty gameDifficulty;
 };
 
-class SetReadyStatePlayerActionMessage : public PlayerActionMessage
-{
+class SetReadyStatePlayerActionMessage : public PlayerActionMessage {
 public:
   SetReadyStatePlayerActionMessage(bool isReady)
-      : PlayerActionMessage(SET_READY_STATE),
-        isReady{isReady} {};
+    : PlayerActionMessage(SET_READY_STATE),
+    isReady{isReady} {};
 
   const bool isReady;
 };
 
-class NotifyCanPlayPlayerActionMessage : public PlayerActionMessage
-{
+class NotifyCanPlayPlayerActionMessage : public PlayerActionMessage {
 public:
   NotifyCanPlayPlayerActionMessage()
-      : PlayerActionMessage(NOTIFY_CAN_PLAY){};
+    : PlayerActionMessage(NOTIFY_CAN_PLAY) {};
 };
 
-class InputPlayerActionMessage : public PlayerActionMessage
-{
+class InputPlayerActionMessage : public PlayerActionMessage {
 public:
   InputPlayerActionMessage(GameplayInput inputPressed, int timeToPress)
-      : PlayerActionMessage(PLAYER_INPUT),
-        inputPressed{inputPressed},
-        timeToPress{timeToPress} {};
+    : PlayerActionMessage(PLAYER_INPUT),
+    inputPressed{inputPressed},
+    timeToPress{timeToPress} {};
 
   const GameplayInput inputPressed;
   const int timeToPress;
 };
 
-class SetReplayReadyStatePlayerActionMessage : public PlayerActionMessage
-{
+class SetReplayReadyStatePlayerActionMessage : public PlayerActionMessage {
 public:
   SetReplayReadyStatePlayerActionMessage(bool isReadyToReplay)
-      : PlayerActionMessage(SET_REPLAY_READY_STATE),
-        isReadyToReplay{isReadyToReplay} {};
+    : PlayerActionMessage(SET_REPLAY_READY_STATE),
+    isReadyToReplay{isReadyToReplay} {};
 
   const bool isReadyToReplay;
 };
 
-class LeaveGamePlayerActionMessage : public PlayerActionMessage
-{
+class LeaveGamePlayerActionMessage : public PlayerActionMessage {
 public:
   LeaveGamePlayerActionMessage()
-      : PlayerActionMessage(LEAVE_GAME){};
+    : PlayerActionMessage(LEAVE_GAME) {};
 };
 
 #endif // PLAYERACTIONMESSAGES_H

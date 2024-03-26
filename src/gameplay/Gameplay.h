@@ -4,28 +4,25 @@
 #include <memory>
 #include "GameplayMessageBroker.h"
 #include "Room.h"
+#include "RoomManager.h"
 
-class Gameplay
-{
+class Gameplay {
 public:
   Gameplay(std::unique_ptr<GameplayMessageBroker> messageBroker);
-  ~Gameplay(){};
+  ~Gameplay() {};
 
   Gameplay(const Gameplay &) = delete;
   Gameplay &operator=(const Gameplay &) = delete;
 
   void start();
 
-  void handlePlayerMessages(int playerId, std::shared_ptr<PlayerActionMessage> message);
+  void handlePlayerMessage(int playerId, std::shared_ptr<PlayerActionMessage> message);
 
 private:
   std::unique_ptr<GameplayMessageBroker> messageBroker;
+  RoomManager roomManager;
 
   void handlePlayerConnectivityMessage(PlayerConnectivityMessage message);
-  void handlePlayerJoinMessage(int playerId, std::shared_ptr<JoinGamePlayerActionMessage> message);
-
-  std::vector<int> playerIds;
-  std::vector<std::unique_ptr<Room>> rooms;
 };
 
 #endif // GAMEPLAY_H

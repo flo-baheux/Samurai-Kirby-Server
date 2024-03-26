@@ -13,41 +13,54 @@
 #include "GameResultDTO.h"
 #include "GetRandomValueInRange.h"
 
-class Room
-{
+class Room {
 public:
-  Room(GameplayMessageBroker &messageBroker, GameDifficulty difficulty = GameDifficulty::HARD)
-      : messageBroker{messageBroker},
-        difficulty{difficulty},
-        secondsBeforeInputRequest{getRandomValueInRange(5, 10)} {};
-  ~Room(){};
+  class RoomConfig {
+  public:
+    RoomConfig(
+      GameDifficulty difficulty = EASY,
+      int secondsBeforeInputRequest = getRandomValueInRange(5, 10),
+      int noInputTimeout = 5,
+      int onePlayerInputOnlyTimeout = 1
+    )
+      : difficulty{difficulty},
+      secondsBeforeInputRequest{secondsBeforeInputRequest},
+      noInputTimeout{noInputTimeout},
+      onePlayerInputOnlyTimeout{onePlayerInputOnlyTimeout} {};
+
+    const GameDifficulty difficulty;
+    const int secondsBeforeInputRequest;
+    const int noInputTimeout;
+    const int onePlayerInputOnlyTimeout;
+  };
+
+  explicit Room(GameplayMessageBroker &messageBroker, RoomConfig config = {}) : messageBroker{messageBroker}, config{config} {};
+  ~Room() {};
   Room(const Room &) = delete;
   Room &operator=(const Room &) = delete;
 
-  const GameDifficulty difficulty;
+  const RoomConfig config;
 
   void addPlayer(int playerId, std::string nickname);
+  void removePlayer(int playerId);
+  bool hasPlayerWithId(int playerId);
   bool const isFull() const;
+  bool const isEmpty() const;
   void tick();
 
 private:
   GameplayMessageBroker &messageBroker;
 
-  enum GameplayState
-  {
+  enum GameplayState {
     WAITING_PLAYERS,
     STARTED,
     EXPECTING_INPUT,
     OVER,
   };
 
-  const int NO_INPUT_TIMEOUT_S{10};
-  const int ONE_PLAYER_ONLY_TIMEOUT_S{1};
-
   GameplayState gameplayState{WAITING_PLAYERS};
 
   std::array<std::optional<Player>, 2> players;
-  int secondsBeforeInputRequest{};
   GameplayInput expectedInput{};
   std::optional<ChronoTimePoint> everyoneCanPlayAt{};
   std::optional<ChronoTimePoint> readyForInputAt{};
@@ -59,7 +72,7 @@ private:
   void handleEveryonePlayed();
   void handleReplay();
 
-  void handlePlayerMessages(int playerId, std::shared_ptr<PlayerActionMessage>);
+  void handlePlayerMessage(int playerId, std::shared_ptr<PlayerActionMessage>);
   void handlePlayerSetReadyStateMessage(Player *player, std::shared_ptr<SetReadyStatePlayerActionMessage> message);
   void handlePlayerNotifyCanPlayMessage(Player *player, std::shared_ptr<NotifyCanPlayPlayerActionMessage> message);
   void handlePlayerInputMessage(Player *player, std::shared_ptr<InputPlayerActionMessage> message);

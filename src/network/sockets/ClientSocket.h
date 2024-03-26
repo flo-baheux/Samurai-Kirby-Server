@@ -14,8 +14,7 @@
 #include <string>
 #include "ServerSocket.h"
 
-class ClientSocket
-{
+class ClientSocket {
 public:
   ClientSocket(SOCKET, sockaddr_in);
   ~ClientSocket();
@@ -30,8 +29,7 @@ public:
 
 private:
   SOCKET _socket;
-  struct sockaddr_in addr
-  {
+  struct sockaddr_in addr {
   };
 };
 

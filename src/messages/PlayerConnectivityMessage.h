@@ -7,17 +7,15 @@
 
 #include "GameDifficulty.h"
 
-enum PlayerConnectivityMessageType
-{
+enum PlayerConnectivityMessageType {
   CONNECT,
   DISCONNECT,
 };
 
-class PlayerConnectivityMessage
-{
+class PlayerConnectivityMessage {
 public:
   explicit PlayerConnectivityMessage(PlayerConnectivityMessageType messageType, int playerId)
-      : messageType{messageType}, playerId{playerId} {};
+    : messageType{ messageType }, playerId{ playerId } {};
 
   const PlayerConnectivityMessageType messageType;
   const int playerId;
