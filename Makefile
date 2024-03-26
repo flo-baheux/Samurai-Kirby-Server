@@ -1,7 +1,6 @@
 CXX := g++
-CXXFLAGS := -std=c++20 -Wall -Wextra -pedantic
+CXXFLAGS := -std=c++20 #-Wall -Wextra -pedantic
 DEBUGFLAGS := -g
-
 
 ifeq ($(OS),Windows_NT)
 CXXFLAGS += -static
@@ -31,9 +30,26 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $(dir $(OBJS))
 
+## TESTS SECTION
+TEST_DIR := ./tests
+TEST_BUILD_DIR := ./tests/build
+TEST_SRCS := $(shell find $(TEST_DIR) -type f -name '*.cpp')
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_BUILD_DIR)/%.o,$(TEST_SRCS))
+TEST_OUTPUT := test
+
+$(TEST_OUTPUT): $(TEST_OBJS) $(filter-out $(BUILD_DIR)/main.o,$(OBJS))
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
+
+$(TEST_BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp | $(TEST_BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDE_FLAG) -I$(TEST_DIR) -c $< -o $@
+
+$(TEST_BUILD_DIR):
+	mkdir -p $(dir $(TEST_OBJS))
+## SECTION END
+
 # Clean rule
 clean:
-	rm -rf $(BUILD_DIR) $(OUTPUT)
+	rm -rf $(BUILD_DIR) $(OUTPUT) $(TEST_BUILD_DIR) $(TEST_OUTPUT)
 
 re: clean all
 

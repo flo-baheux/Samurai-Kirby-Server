@@ -11,8 +11,7 @@
 #include <fcntl.h>
 #endif
 
-class ServerSocket
-{
+class ServerSocket {
 public:
   ServerSocket(int port);
   ~ServerSocket();
@@ -23,8 +22,7 @@ public:
   SOCKET getInternalSocket();
 
 private:
-  struct sockaddr_in serverAddr
-  {
+  struct sockaddr_in serverAddr {
   };
   SOCKET _socket;
 };

@@ -9,8 +9,7 @@
 using PlayerActionMessageCallback = std::function<void(int, std::shared_ptr<PlayerActionMessage>)>;
 using PlayerConnectivityMessageCallback = std::function<void(PlayerConnectivityMessage)>;
 
-class GameplayMessageBroker
-{
+class GameplayMessageBroker {
 public:
   GameplayMessageBroker(MessageHub &messageHub) : messageHub{messageHub} {};
 
@@ -22,9 +21,11 @@ public:
   void subscribeToPlayerConnectivityMessages(PlayerConnectivityMessageCallback callback);
   void subscribeToPlayerActionMessages(int playerId, PlayerActionMessageCallback callback);
 
-private:
+  // private:
+    // Dispatch should be in a different class to avoid messageBroker holders to be able to dispatch
   void dispatchMessages();
 
+private:
   MessageHub &messageHub;
   std::function<void(PlayerConnectivityMessage)> connectivityMessageCallback;
   std::unordered_map<int, std::vector<PlayerActionMessageCallback>> playerActionMessageCallbacksByPlayerId;

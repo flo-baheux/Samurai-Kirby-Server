@@ -8,12 +8,10 @@
 
 using GameplayMessageCallback = std::function<void(std::shared_ptr<GameplayMessage>)>;
 
-// TODO: Message -> Message
-class NetworkMessageBroker
-{
+class NetworkMessageBroker {
   friend class Server;
 
-public:
+  public:
   NetworkMessageBroker(MessageHub &messageHub) : messageHub{messageHub} {};
 
   NetworkMessageBroker(NetworkMessageBroker const &) = delete;
@@ -24,7 +22,7 @@ public:
 
   void subscribeToGameplayMessagesForPlayer(int playerId, GameplayMessageCallback callback);
 
-private:
+  private:
   MessageHub &messageHub;
 
   // For now lets try with id -> one callback, not multiple ones

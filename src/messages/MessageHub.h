@@ -9,10 +9,10 @@
 #include "PlayerActionMessages.h"
 #include "GameplayMessages.h"
 
-class MessageHub
-{
-public:
-  ~MessageHub(){};
+class MessageHub {
+  public:
+  MessageHub() {};
+  ~MessageHub() {};
   MessageHub(MessageHub const &) = delete;
   void operator=(MessageHub const &) = delete;
 
@@ -21,8 +21,8 @@ public:
 
   std::queue<PlayerConnectivityMessage> playerConnectivityMessages;
 
-private:
-  MessageHub(){};
+  private:
+  // MessageHub() {};
 
   friend class Server;
 };
