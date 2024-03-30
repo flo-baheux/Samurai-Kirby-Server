@@ -39,7 +39,6 @@ public:
   Room(const Room &) = delete;
   Room &operator=(const Room &) = delete;
 
-  const RoomConfig config;
 
   void addPlayer(int playerId, std::string nickname);
   void removePlayer(int playerId);
@@ -47,6 +46,8 @@ public:
   bool const isFull() const;
   bool const isEmpty() const;
   void tick();
+
+  RoomConfig config;
 
 private:
   GameplayMessageBroker &messageBroker;

@@ -16,7 +16,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"messageType":0,"otherPlayer":null,"playerAssignment":0})"
         );
@@ -28,7 +28,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"messageType":0,"otherPlayer":{"assignment":1,"isReady":true,"nickname":"Player2"},"playerAssignment":0})"
         );
@@ -41,7 +41,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"messageType":1,"player":{"assignment":1,"isReady":true,"nickname":"Player2"}})"
       );
@@ -53,7 +53,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"messageType":2,"playerAssignment":1})"
       );
@@ -65,7 +65,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"isReady":true,"messageType":3,"playerAssignment":1})"
       );
@@ -77,7 +77,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"messageType":4})"
       );
@@ -89,7 +89,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"expectedInput":3,"messageType":5})"
       );
@@ -108,7 +108,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":6})"
         );
@@ -126,7 +126,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":3,"timeToPress":300},"winningPlayer":0},"messageType":6})"
         );
@@ -146,7 +146,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":7})"
         );
@@ -164,7 +164,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":3,"timeToPress":300},"winningPlayer":0},"messageType":7})"
         );
@@ -184,7 +184,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":8})"
         );
@@ -202,7 +202,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":3,"timeToPress":300},"winningPlayer":0},"messageType":8})"
         );
@@ -222,7 +222,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":null,"timeToPress":null},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":9})"
         );
@@ -240,7 +240,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
       THEN("The result is properly stringified") {
         REQUIRE(
-          Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+          Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
           ==
           R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":250},"player2":{"assignment":1,"inputPressed":3,"timeToPress":300},"winningPlayer":0},"messageType":9})"
         );
@@ -253,7 +253,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":100},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":6})"
       );
@@ -265,7 +265,7 @@ SCENARIO("Serializing Gameplay Messages", "[Serialize][GameplayMessage]") {
 
     THEN("The result is properly stringified") {
       REQUIRE(
-        Serializer::serialize(dynamic_cast<GameplayMessage &>(message))
+        Serializer::serializeGameplayMessage(dynamic_cast<GameplayMessage &>(message))
         ==
         R"({"gameResult":{"player1":{"assignment":0,"inputPressed":3,"timeToPress":100},"player2":{"assignment":1,"inputPressed":null,"timeToPress":null},"winningPlayer":0},"messageType":6})"
       );

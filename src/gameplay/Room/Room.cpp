@@ -7,6 +7,7 @@ void Room::tick() {
       break;
     case STARTED:
       handleEveryoneCanPlay();
+      handleOnePlayerPlayed();
       break;
     case EXPECTING_INPUT:
       handleOnePlayerPlayed();
@@ -132,8 +133,14 @@ void Room::handleReplay() {
 
   // TODO: CODE
 
-  // players[P1].reset();
-  // players[P2].reset();
+  players[P1].value().resetToReplay();
+  players[P2].value().resetToReplay();
+  expectedInput = {};
+  everyoneCanPlayAt = std::nullopt;
+  readyForInputAt = std::nullopt;
+  // config = RoomConfig{config.difficulty, getRandomValueInRange(5, 10), config.noInputTimeout, config.onePlayerInputOnlyTimeout};
+  broadcastGameplayMessage(std::make_shared<AllReplayReadyGameStartingMessage>());
+  gameplayState = STARTED;
 };
 
 void Room::handlePlayerSetReadyStateMessage(Player *player, std::shared_ptr<SetReadyStatePlayerActionMessage> message) {

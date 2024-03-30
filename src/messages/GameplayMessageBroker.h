@@ -21,8 +21,7 @@ public:
   void subscribeToPlayerConnectivityMessages(PlayerConnectivityMessageCallback callback);
   void subscribeToPlayerActionMessages(int playerId, PlayerActionMessageCallback callback);
 
-  // private:
-    // Dispatch should be in a different class to avoid messageBroker holders to be able to dispatch
+  // TODO: Dispatch should be in a different class to avoid messageBroker holders to be able to dispatch
   void dispatchMessages();
 
 private:

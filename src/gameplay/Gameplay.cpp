@@ -1,7 +1,7 @@
 #include "Gameplay.h"
 
 Gameplay::Gameplay(std::unique_ptr<GameplayMessageBroker> messageBroker)
-  : messageBroker{std::move(messageBroker)}, roomManager{*messageBroker} {
+  : messageBroker{std::move(messageBroker)}, roomManager{*Gameplay::messageBroker} {
   Gameplay::messageBroker->subscribeToPlayerConnectivityMessages(
     [this](PlayerConnectivityMessage message) { handlePlayerConnectivityMessage(message); });
 };

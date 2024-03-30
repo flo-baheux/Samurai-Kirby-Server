@@ -11,7 +11,7 @@ using GameplayMessageCallback = std::function<void(std::shared_ptr<GameplayMessa
 class NetworkMessageBroker {
   friend class Server;
 
-  public:
+public:
   NetworkMessageBroker(MessageHub &messageHub) : messageHub{messageHub} {};
 
   NetworkMessageBroker(NetworkMessageBroker const &) = delete;
@@ -21,8 +21,9 @@ class NetworkMessageBroker {
   void publishPlayerActionMessage(int playerId, std::shared_ptr<PlayerActionMessage> message);
 
   void subscribeToGameplayMessagesForPlayer(int playerId, GameplayMessageCallback callback);
+  void unsubscribeToGameplayMessagesForPlayer(int playerId);
 
-  private:
+private:
   MessageHub &messageHub;
 
   // For now lets try with id -> one callback, not multiple ones

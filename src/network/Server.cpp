@@ -14,7 +14,7 @@ void Server::initNetwork() {
 #ifdef _WIN32
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-    throw new std::runtime_error("Failed to initialize Winsock");
+    throw std::runtime_error("Failed to initialize Winsock");
   }
 #endif
 };
@@ -63,10 +63,8 @@ void Server::handleClientsCommunication() {
 
 std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection() {
   SOCKET socket;
-  struct sockaddr_in clientAddr
-  {
-  };
-  socklen_t clientAddrLen{ sizeof(clientAddr) };
+  struct sockaddr_in clientAddr {};
+  socklen_t clientAddrLen{sizeof(clientAddr)};
 
   if ((socket = accept(serverSocket->getInternalSocket(), (struct sockaddr *) &clientAddr, &clientAddrLen)) == -1) {
 #ifdef _WIN32

@@ -12,6 +12,10 @@ void NetworkMessageBroker::subscribeToGameplayMessagesForPlayer(int playerId, Ga
   gameplayMessageCallbackByPlayerId[playerId] = callback;
 }
 
+void NetworkMessageBroker::unsubscribeToGameplayMessagesForPlayer(int playerId) {
+  gameplayMessageCallbackByPlayerId.erase(playerId);
+}
+
 void NetworkMessageBroker::dispatchMessages() {
   std::vector<int> playerIdsWithListeners;
   for (const auto &pair : gameplayMessageCallbackByPlayerId) {

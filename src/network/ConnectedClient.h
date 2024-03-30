@@ -9,11 +9,10 @@
 class RoomsManager;
 class GameplayRoom;
 
-class ConnectedClient
-{
+class ConnectedClient {
 public:
   ConnectedClient(std::unique_ptr<ClientSocket>, NetworkMessageBroker &, int id);
-  ~ConnectedClient() {};
+  ~ConnectedClient();
 
   ConnectedClient() = delete;
   ConnectedClient(const ConnectedClient &) = delete;
@@ -33,7 +32,7 @@ private:
   std::unique_ptr<ClientSocket> clientSocket;
   NetworkMessageBroker &messageBroker;
 
-  bool hasBeenDisconnected{ false };
+  bool hasBeenDisconnected{false};
 
   int id{};
 };

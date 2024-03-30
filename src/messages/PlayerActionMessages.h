@@ -9,12 +9,12 @@
 #include "GameplayInput.h"
 
 enum PlayerActionMessageType {
-  JOIN_GAME,
-  SET_READY_STATE,
-  NOTIFY_CAN_PLAY,
-  PLAYER_INPUT,
-  SET_REPLAY_READY_STATE,
-  LEAVE_GAME,
+  JOIN_GAME = 0,
+  SET_READY_STATE = 1,
+  NOTIFY_CAN_PLAY = 2,
+  PLAYER_INPUT = 3,
+  SET_REPLAY_READY_STATE = 4,
+  LEAVE_GAME = 5,
 };
 
 class PlayerActionMessage {
