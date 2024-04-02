@@ -5,8 +5,8 @@
 ServerSocket::ServerSocket(int port) {
   struct sockaddr_in serverAddr;
   if ((_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
-    int err = WSAGetLastError();
 #ifdef _WIN32
+    int err = WSAGetLastError();
     std::cerr << "Winsock error " << err << std::endl;
     WSACleanup();
 #else
@@ -42,9 +42,8 @@ ServerSocket::ServerSocket(int port) {
 
   // Bind the socket
   if (bind(_socket, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) == -1) {
-    int err = WSAGetLastError();
-
 #ifdef _WIN32
+    int err = WSAGetLastError();
     std::cerr << "Winsock error " << err << std::endl;
     closesocket(_socket);
     WSACleanup();
