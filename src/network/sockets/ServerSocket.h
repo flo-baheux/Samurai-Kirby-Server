@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
+typedef int SOCKET
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -19,11 +20,10 @@ public:
   ServerSocket() = delete;
   ServerSocket(const ServerSocket &) = delete;
 
-  SOCKET getInternalSocket();
+  int getInternalSocket();
 
 private:
-  struct sockaddr_in serverAddr {
-  };
+  struct sockaddr_in serverAddr {};
   SOCKET _socket;
 };
 

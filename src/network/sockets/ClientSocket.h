@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
+typedef int SOCKET
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -29,8 +30,7 @@ public:
 
 private:
   SOCKET _socket;
-  struct sockaddr_in addr {
-  };
+  struct sockaddr_in addr {};
 };
 
 #endif
