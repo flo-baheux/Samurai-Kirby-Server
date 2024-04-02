@@ -62,7 +62,7 @@ void Server::handleClientsCommunication() {
 }
 
 std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection() {
-  SOCKET socket;
+  int socket;
   struct sockaddr_in clientAddr {};
   socklen_t clientAddrLen{sizeof(clientAddr)};
 
@@ -75,10 +75,9 @@ std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection() {
       return std::nullopt;
     }
 #else
-    if (errno != EWOULDBLOCK && errno != EAGAIN))
-    {
+    if (errno != EWOULDBLOCK && errno != EAGAIN) {
       throw std::runtime_error("Failed to accept connection");
-      } else {
+    } else {
       return std::nullopt;
     }
 #endif

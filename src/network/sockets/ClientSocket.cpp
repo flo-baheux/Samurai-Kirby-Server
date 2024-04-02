@@ -2,7 +2,7 @@
 
 #include "ClientSocket.h"
 
-ClientSocket::ClientSocket(SOCKET socket, sockaddr_in addr) : _socket{socket}, addr{addr} {
+ClientSocket::ClientSocket(int socket, sockaddr_in addr) : _socket{socket}, addr{addr} {
 
   // On Windows, client socket IO is inherited from server socket
   // On UNIX, client socket IO is not inherited but rather set as blocking by default
@@ -43,7 +43,7 @@ int ClientSocket::getPort() const {
   return ntohs(addr.sin_port);
 };
 
-SOCKET ClientSocket::getInternalSocket() {
+int ClientSocket::getInternalSocket() {
   return _socket;
 }
 

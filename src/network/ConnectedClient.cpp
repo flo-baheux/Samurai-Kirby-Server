@@ -66,7 +66,7 @@ void ConnectedClient::receiveFromNetwork() {
     }
 #else
     if (errno != EWOULDBLOCK && errno != EAGAIN) {
-      messageBroker.publishPlayerConnectivityMessage(PlayerConnectMessage{id});
+      messageBroker.publishPlayerConnectivityMessage(PlayerConnectivityMessage{DISCONNECT, id});
 
       throw std::runtime_error("Failed to receive data");
     }

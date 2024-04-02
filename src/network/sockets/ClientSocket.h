@@ -16,7 +16,7 @@
 
 class ClientSocket {
 public:
-  ClientSocket(SOCKET, sockaddr_in);
+  ClientSocket(int, sockaddr_in);
   ~ClientSocket();
 
   ClientSocket() = delete;
@@ -25,12 +25,11 @@ public:
   char *getIP() const;
   int getPort() const;
   void send(const std::string message);
-  SOCKET getInternalSocket();
+  int getInternalSocket();
 
 private:
-  SOCKET _socket;
-  struct sockaddr_in addr {
-  };
+  int _socket;
+  struct sockaddr_in addr {};
 };
 
 #endif
