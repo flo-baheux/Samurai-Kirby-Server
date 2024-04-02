@@ -5,7 +5,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
-typedef int SOCKET
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -17,7 +16,7 @@ typedef int SOCKET
 
 class ClientSocket {
 public:
-  ClientSocket(SOCKET, sockaddr_in);
+  ClientSocket(int, sockaddr_in);
   ~ClientSocket();
 
   ClientSocket() = delete;
@@ -26,10 +25,10 @@ public:
   char *getIP() const;
   int getPort() const;
   void send(const std::string message);
-  SOCKET getInternalSocket();
+  int getInternalSocket();
 
 private:
-  SOCKET _socket;
+  int _socket;
   struct sockaddr_in addr {};
 };
 

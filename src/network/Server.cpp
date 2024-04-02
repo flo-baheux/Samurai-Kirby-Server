@@ -62,7 +62,7 @@ void Server::handleClientsCommunication() {
 }
 
 std::optional<std::unique_ptr<ClientSocket>> Server::acceptConnection() {
-  SOCKET socket;
+  int socket;
   struct sockaddr_in clientAddr {};
   socklen_t clientAddrLen{sizeof(clientAddr)};
 

@@ -78,6 +78,6 @@ ServerSocket::~ServerSocket() {
 #endif
 }
 
-SOCKET ServerSocket::getInternalSocket() {
+int ServerSocket::getInternalSocket() {
   return _socket;
 }
