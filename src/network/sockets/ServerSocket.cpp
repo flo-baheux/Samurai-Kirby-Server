@@ -49,7 +49,7 @@ ServerSocket::ServerSocket(int port) {
     WSACleanup();
 #else
     perror("Error binding socket");
-    close(serverSocket);
+    close(_socket);
 #endif
     throw std::runtime_error("Failed to bind socket");
   }
