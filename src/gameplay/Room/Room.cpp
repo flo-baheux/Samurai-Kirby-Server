@@ -131,14 +131,11 @@ void Room::handleReplay() {
   if (gameplayState != OVER || !everyoneWantsToReplay())
     return;
 
-  // TODO: CODE
-
   players[P1].value().resetToReplay();
   players[P2].value().resetToReplay();
   expectedInput = {};
   everyoneCanPlayAt = std::nullopt;
   readyForInputAt = std::nullopt;
-  // config = RoomConfig{config.difficulty, getRandomValueInRange(5, 10), config.noInputTimeout, config.onePlayerInputOnlyTimeout};
   broadcastGameplayMessage(std::make_shared<AllReplayReadyGameStartingMessage>());
   gameplayState = STARTED;
 };
@@ -190,7 +187,8 @@ void Room::addPlayer(int id, std::string nickname) {
     messageBroker.publishGameplayMessage(players[otherAssignment].value().id, std::make_shared<PlayerJoinedRoomMessage>(player.buildLobbyDTO()));
 
   messageBroker.subscribeToPlayerActionMessages(id,
-    [this](int playerId, std::shared_ptr<PlayerActionMessage> e) { handlePlayerMessage(playerId, e); });
+    [this](int playerId, std::shared_ptr<PlayerActionMessage> e) { handlePlayerMessage(playerId, e); },
+    this);
 }
 
 void Room::removePlayer(int id) {
@@ -200,7 +198,7 @@ void Room::removePlayer(int id) {
   }
 
   players[player.value()->assignment] = std::nullopt;
-  // TODO remove subscription
+  messageBroker.unsubscribeToPlayerActionMessages(player.value()->id, this);
   gameplayState = WAITING_PLAYERS;
   broadcastGameplayMessage(std::make_shared<PlayerLeftRoomMessage>(player.value()->assignment));
 }

@@ -1,33 +1,45 @@
 #include "GameplayMessageBroker.h"
 
-void GameplayMessageBroker::subscribeToPlayerConnectivityMessages(PlayerConnectivityMessageCallback callback) {
-  connectivityMessageCallback = callback;
+void GameplayMessageBroker::subscribeToPlayerConnectivityMessages(PlayerConnectivityCallback callback) {
+  connectivityCallback = callback;
 };
 
-void GameplayMessageBroker::subscribeToPlayerActionMessages(int playerId, PlayerActionMessageCallback callback) {
-  playerActionMessageCallbacksByPlayerId[playerId].push_back(callback);
+void GameplayMessageBroker::subscribeToPlayerActionMessages(int playerId, PlayerActionCallback callback, void *context) {
+
+  playerActionCallbacksWithContextByPlayerId[playerId].push_back(std::make_pair(context, callback));
+}
+
+void GameplayMessageBroker::unsubscribeToPlayerActionMessages(int playerId, void *context) {
+  std::vector<PlayerActionCallbackWithContext> callbacksWithContext = playerActionCallbacksWithContextByPlayerId[playerId];
+
+  for (auto it = callbacksWithContext.begin(); it != callbacksWithContext.end();) {
+    PlayerActionCallbackWithContext &callbackWithContext = *it;
+    if (callbackWithContext.first == context)
+      it = callbacksWithContext.erase(it);
+    else
+      it++;
+  }
 }
 
 // Note: This method does not scale well.
-// This is fine for now (performances can be evaluated)
-// However in a context with more concurrent users we could use a threadpool + playerId sharding
+// This is fine for now.
+// However in a context with more concurrent users we could use a threadpool, playerId sharding, etc.
 void GameplayMessageBroker::dispatchMessages() {
   while (!messageHub.playerConnectivityMessages.empty()) {
-    connectivityMessageCallback(messageHub.playerConnectivityMessages.front());
+    connectivityCallback(messageHub.playerConnectivityMessages.front());
     messageHub.playerConnectivityMessages.pop();
   }
 
-  std::vector<int> playerIdsWithListeners;
-  for (const auto &pair : playerActionMessageCallbacksByPlayerId) {
+  for (const auto &pair : playerActionCallbacksWithContextByPlayerId) {
     const int playerIdWithListeners = pair.first;
-    const auto callbackList = pair.second;
+    const auto callbacksWithContext = pair.second;
     auto &messageQueueForPlayerId = messageHub.playerActionMessagesByPlayerId[playerIdWithListeners];
     while (!messageQueueForPlayerId.empty()) {
-      for (const auto &callback : callbackList) {
+      for (const auto &callbackWithContext : callbacksWithContext) {
         try {
-          callback(playerIdWithListeners, messageQueueForPlayerId.front());
+          callbackWithContext.second(playerIdWithListeners, messageQueueForPlayerId.front());
         } catch (std::exception error) {
-          // Do something with this error
+          // TODO: Logger
           std::cerr << "Error while calling callback:" << error.what() << std::endl;
         }
       }

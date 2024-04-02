@@ -16,8 +16,6 @@ public:
 
   void start();
 
-  void handlePlayerMessage(int playerId, std::shared_ptr<PlayerActionMessage> message);
-
 private:
   std::unique_ptr<GameplayMessageBroker> messageBroker;
   RoomManager roomManager;

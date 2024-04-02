@@ -118,36 +118,3 @@ SCENARIO("Rooms - Adding player", "[room][addingPlayer]") {
     }
   }
 }
-
-//   std::cout << "scenario inside called" << std::endl;
-
-//   GIVEN("A player with ID 1") {
-//     int playerId = 1;
-//     messageBroker.subscribeToPlayerActionMessages(playerId,
-//       [&](int playerId, std::shared_ptr<PlayerActionMessage> e) {
-//         roomManager.handlePlayerMessage(playerId, e);
-//       });
-
-//     WHEN("The player requests to join a room on MEDIUM difficulty") {
-//       auto msg = std::make_shared<JoinGamePlayerActionMessage>(
-//         "Nickname",
-//         MEDIUM
-//       );
-
-//       messageHub.playerActionMessagesByPlayerId[playerId].push(msg);
-//       messageBroker.dispatchMessages();
-//       roomManager.tickAllRooms();
-
-//       THEN("A message is sent to the player notifying him he joined a room") {
-//         REQUIRE(messageHub.gameplayMessagesByPlayerId[playerId].size() == 1);
-
-//         std::shared_ptr<GameplayMessage> message = messageHub.gameplayMessagesByPlayerId[playerId].front();
-//         messageHub.gameplayMessagesByPlayerId[playerId].pop();
-
-//         REQUIRE(message->messageType == PLAYER_JOINED_GAME);
-//       }
-//       THEN("The room is waiting for another player") {}
-//     }
-//   }
-
-// }

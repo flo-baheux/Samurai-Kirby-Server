@@ -21,11 +21,11 @@ void Gameplay::handlePlayerConnectivityMessage(PlayerConnectivityMessage message
       messageBroker->subscribeToPlayerActionMessages(message.playerId,
         [this](int playerId, std::shared_ptr<PlayerActionMessage> e) {
           roomManager.handlePlayerMessage(playerId, e);
-        });
+        }, this);
       break;
     case DISCONNECT:
       roomManager.removePlayerFromRoom(message.playerId);
-      // TODO Unsub to player action messages
+      messageBroker->unsubscribeToPlayerActionMessages(message.playerId, this);
       break;
     default:
       break;

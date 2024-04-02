@@ -26,8 +26,6 @@ public:
 private:
   MessageHub &messageHub;
 
-  // For now lets try with id -> one callback, not multiple ones
-  // NB: Could restrict visibility of this to prmessage friend class from directly accessing it.
   std::unordered_map<int, GameplayMessageCallback> gameplayMessageCallbackByPlayerId;
 
   void dispatchMessages();

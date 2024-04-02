@@ -17,7 +17,6 @@ void NetworkMessageBroker::unsubscribeToGameplayMessagesForPlayer(int playerId) 
 }
 
 void NetworkMessageBroker::dispatchMessages() {
-  std::vector<int> playerIdsWithListeners;
   for (const auto &pair : gameplayMessageCallbackByPlayerId) {
     const int playerId = pair.first;
     const auto callback = pair.second;
