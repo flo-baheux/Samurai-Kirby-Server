@@ -1,5 +1,4 @@
-#ifndef CONNECTEDCLIENT_H
-#define CONNECTEDCLIENT_H
+#pragma once
 
 #include <memory>
 
@@ -36,5 +35,3 @@ private:
 
   int id{};
 };
-
-#endif // CONNECTEDCLIENT_H

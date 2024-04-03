@@ -1,15 +1,11 @@
-#ifndef GAMEPLAYINPUT_H
-#define GAMEPLAYINPUT_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
 
-enum GameplayInput
-{
+enum GameplayInput {
   NORTH = 0,
   WEST = 1,
   EAST = 2,
   SOUTH = 3
 };
-
-#endif // GAMEPLAYINPUT_H

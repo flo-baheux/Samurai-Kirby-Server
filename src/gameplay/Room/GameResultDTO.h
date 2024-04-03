@@ -5,8 +5,7 @@
 #include "PlayerAssignment.h"
 #include "PlayerDTO.h"
 
-struct GameResultDTO
-{
+struct GameResultDTO {
   std::optional<PlayerAssignment> winningPlayer;
   PlayerGameResultDTO player1;
   PlayerGameResultDTO player2;

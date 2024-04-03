@@ -1,5 +1,4 @@
-#ifndef MESSAGEHUB_H
-#define MESSAGEHUB_H
+#pragma once
 
 #include <queue>
 #include <memory>
@@ -10,7 +9,7 @@
 #include "GameplayMessages.h"
 
 class MessageHub {
-  public:
+public:
   MessageHub() {};
   ~MessageHub() {};
   MessageHub(MessageHub const &) = delete;
@@ -21,10 +20,6 @@ class MessageHub {
 
   std::queue<PlayerConnectivityMessage> playerConnectivityMessages;
 
-  private:
-  // MessageHub() {};
-
+private:
   friend class Server;
 };
-
-#endif // MESSAGEHUB_H

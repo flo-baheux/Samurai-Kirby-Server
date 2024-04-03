@@ -1,5 +1,4 @@
-#ifndef GAMEPLAY_H
-#define GAMEPLAY_H
+#pragma once
 
 #include <memory>
 #include "GameplayMessageBroker.h"
@@ -22,5 +21,3 @@ private:
 
   void handlePlayerConnectivityMessage(PlayerConnectivityMessage message);
 };
-
-#endif // GAMEPLAY_H

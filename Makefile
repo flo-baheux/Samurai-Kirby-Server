@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -std=c++20 #-Wall -Wextra -pedantic
+CXXFLAGS := -std=c++20 -Wall -Wextra -pedantic
 DEBUGFLAGS := -g
 
 ifeq ($(OS),Windows_NT)

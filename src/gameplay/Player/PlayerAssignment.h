@@ -1,10 +1,6 @@
-#ifndef PLAYERASSIGNMENT_H
-#define PLAYERASSIGNMENT_H
+#pragma once
 
-enum PlayerAssignment
-{
+enum PlayerAssignment {
   P1 = 0,
   P2 = 1,
 };
-
-#endif // PLAYERASSIGNMENT_H

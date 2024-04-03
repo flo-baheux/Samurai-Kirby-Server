@@ -1,5 +1,4 @@
-#ifndef PLAYERCONNECTIVITYMESSAGE_H
-#define PLAYERCONNECTIVITYMESSAGE_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -15,10 +14,8 @@ enum PlayerConnectivityMessageType {
 class PlayerConnectivityMessage {
 public:
   explicit PlayerConnectivityMessage(PlayerConnectivityMessageType messageType, int playerId)
-    : messageType{ messageType }, playerId{ playerId } {};
+    : messageType{messageType}, playerId{playerId} {};
 
   const PlayerConnectivityMessageType messageType;
   const int playerId;
 };
-
-#endif // PLAYERCONNECTIVITYMESSAGE_H

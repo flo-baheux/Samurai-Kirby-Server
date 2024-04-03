@@ -1,5 +1,4 @@
-#ifndef GAMEPLAYMESSAGES_H
-#define GAMEPLAYMESSAGES_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -141,5 +140,3 @@ public:
   AllReplayReadyGameStartingMessage()
     : GameplayMessage(ALL_REPLAY_READY_GAME_STARTING) {};
 };
-
-#endif // GAMEPLAYMESSAGES_H

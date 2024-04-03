@@ -1,5 +1,4 @@
-#ifndef CLIENTSOCKET_H
-#define CLIENTSOCKET_H
+#pragma once 
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -31,5 +30,3 @@ private:
   int _socket;
   struct sockaddr_in addr {};
 };
-
-#endif

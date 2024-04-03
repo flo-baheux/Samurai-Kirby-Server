@@ -1,5 +1,4 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
 
 #include <string>
 #include <optional>
@@ -9,15 +8,14 @@
 #include "GameplayChrono.h"
 #include "PlayerDTO.h"
 
-class Player
-{
+class Player {
   friend class Room;
 
 private:
   Player(int id, std::string nickname, PlayerAssignment assignment)
-      : id{id},
-        nickname{nickname},
-        assignment{assignment} {};
+    : id{id},
+    nickname{nickname},
+    assignment{assignment} {};
 
 public:
   int id;
@@ -34,5 +32,3 @@ public:
   const PlayerLobbyDTO buildLobbyDTO() const;
   const PlayerGameResultDTO buildGameoverDTO() const;
 };
-
-#endif

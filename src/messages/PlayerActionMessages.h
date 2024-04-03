@@ -1,5 +1,4 @@
-#ifndef PLAYERACTIONMESSAGES_H
-#define PLAYERACTIONMESSAGES_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -78,5 +77,3 @@ public:
   LeaveGamePlayerActionMessage()
     : PlayerActionMessage(LEAVE_GAME) {};
 };
-
-#endif // PLAYERACTIONMESSAGES_H

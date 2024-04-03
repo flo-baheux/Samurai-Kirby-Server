@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -19,8 +18,7 @@
 #include "MessageHub.h"
 #include "Gameplay.h"
 
-class Server
-{
+class Server {
 public:
   Server();
   ~Server() {};
@@ -38,7 +36,7 @@ private:
   MessageHub messageHub;
   std::unique_ptr<NetworkMessageBroker> messageBroker;
 
-  std::unique_ptr<ServerSocket> serverSocket{ nullptr };
+  std::unique_ptr<ServerSocket> serverSocket{nullptr};
   std::vector<std::unique_ptr<ConnectedClient>> connectedClients{};
 
   /**
@@ -52,5 +50,3 @@ private:
 
   std::optional<std::unique_ptr<ClientSocket>> acceptConnection();
 };
-
-#endif

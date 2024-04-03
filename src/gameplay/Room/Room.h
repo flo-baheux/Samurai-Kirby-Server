@@ -1,5 +1,4 @@
-#ifndef ROOM_H
-#define ROOM_H
+#pragma once
 
 #include <iostream>
 #include <optional>
@@ -96,5 +95,3 @@ private:
 
   const GameResultDTO buildGameResultDTO(std::optional<PlayerAssignment> = std::nullopt) const;
 };
-
-#endif

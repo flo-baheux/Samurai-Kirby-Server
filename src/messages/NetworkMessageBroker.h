@@ -1,5 +1,4 @@
-#ifndef NETWORKMESSAGEHUB_H
-#define NETWORKMESSAGEHUB_H
+#pragma once
 
 #include <vector>
 #include <functional>
@@ -30,5 +29,3 @@ private:
 
   void dispatchMessages();
 };
-
-#endif // NETWORKMESSAGEHUB_H

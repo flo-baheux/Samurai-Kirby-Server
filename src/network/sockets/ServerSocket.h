@@ -1,5 +1,4 @@
-#ifndef SERVERSOCKET_H
-#define SERVERSOCKET_H
+#pragma once
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -26,5 +25,3 @@ private:
   struct sockaddr_in serverAddr {};
   int _socket;
 };
-
-#endif

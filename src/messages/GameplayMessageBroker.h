@@ -1,9 +1,9 @@
-#ifndef GAMEPLAYMESSAGEBROKER_H
-#define GAMEPLAYMESSAGEBROKER_H
+#pragma once
 
 #include <vector>
 #include <unordered_map>
 #include <functional>
+
 #include "MessageHub.h"
 
 using PlayerConnectivityCallback = std::function<void(PlayerConnectivityMessage)>;
@@ -34,5 +34,3 @@ private:
 
   friend class Gameplay;
 };
-
-#endif // GAMEPLAYMESSAGEBROKER_H
