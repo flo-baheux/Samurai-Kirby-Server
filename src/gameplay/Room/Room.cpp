@@ -197,9 +197,21 @@ void Room::removePlayer(int id) {
     return;
   }
 
+  if (players[P1].has_value())
+    players[P1].value().resetToReplay();
+
+
+  if (players[P2].has_value())
+    players[P2].value().resetToReplay();
+
+  expectedInput = {};
+  everyoneCanPlayAt = std::nullopt;
+  readyForInputAt = std::nullopt;
+
   players[player.value()->assignment] = std::nullopt;
-  messageBroker.unsubscribeToPlayerActionMessages(player.value()->id, this);
   gameplayState = WAITING_PLAYERS;
+
+  messageBroker.unsubscribeToPlayerActionMessages(player.value()->id, this);
   broadcastGameplayMessage(std::make_shared<PlayerLeftRoomMessage>(player.value()->assignment));
 }
 
