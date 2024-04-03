@@ -203,31 +203,31 @@ void Room::removePlayer(int id) {
   broadcastGameplayMessage(std::make_shared<PlayerLeftRoomMessage>(player.value()->assignment));
 }
 
-inline bool const Room::isFull() const {
+bool Room::isFull() const {
   return players[P1].has_value() && players[P2].has_value();
 }
 
-bool const Room::isEmpty() const {
+bool Room::isEmpty() const {
   return !players[P1].has_value() && !players[P2].has_value();
 }
 
-inline bool Room::isEveryoneReady() const {
+bool Room::isEveryoneReady() const {
   return isFull() && players[P1].value().isReady && players[P2].value().isReady;
 }
 
-inline bool Room::everyoneCanPlay() const {
+bool Room::everyoneCanPlay() const {
   return isFull() && players[P1].value().canPlay && players[P2].value().canPlay;
 }
 
-inline bool Room::everyonePlayed() const {
+bool Room::everyonePlayed() const {
   return isFull() && players[P1].value().inputPressed.has_value() && players[P2].value().inputPressed.has_value();
 }
 
-inline bool Room::noOnePlayed() const {
+bool Room::noOnePlayed() const {
   return isFull() && !players[P1].value().inputPressed.has_value() && !players[P2].value().inputPressed.has_value();
 }
 
-inline bool Room::everyoneWantsToReplay() const {
+bool Room::everyoneWantsToReplay() const {
   return isFull() && players[P1].value().isReadyToReplay && players[P2].value().isReadyToReplay;
 }
 
@@ -251,7 +251,7 @@ std::optional<Player *> Room::getPlayerById(int id) {
     return std::nullopt;
 }
 
-const std::optional<const PlayerAssignment> Room::getAvailableAssignment() const {
+std::optional<const PlayerAssignment> Room::getAvailableAssignment() const {
   if (!players[P1].has_value())
     return PlayerAssignment::P1;
   else if (!players[P2].has_value())
@@ -260,7 +260,7 @@ const std::optional<const PlayerAssignment> Room::getAvailableAssignment() const
     return std::nullopt;
 }
 
-const GameplayInput Room::getRandomGameplayInput() const {
+GameplayInput Room::getRandomGameplayInput() const {
   std::vector<GameplayInput> inputs = {SOUTH, EAST, WEST, NORTH};
   switch (config.difficulty) {
     default:
@@ -273,7 +273,7 @@ const GameplayInput Room::getRandomGameplayInput() const {
   }
 }
 
-const GameResultDTO Room::buildGameResultDTO(std::optional<PlayerAssignment> winningPlayer) const {
+GameResultDTO Room::buildGameResultDTO(std::optional<PlayerAssignment> winningPlayer) const {
   return {
     winningPlayer,
     players[P1].value().buildGameoverDTO(),

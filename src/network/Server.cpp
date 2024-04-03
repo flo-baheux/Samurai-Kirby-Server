@@ -29,7 +29,7 @@ void Server::start(int port) {
     try {
       handleNewClientConnection();
       handleClientsCommunication();
-    } catch (std::runtime_error e) {
+    } catch (std::runtime_error &e) {
       std::cerr << e.what() << std::endl;
     }
   }

@@ -38,7 +38,7 @@ void GameplayMessageBroker::dispatchMessages() {
       for (const auto &callbackWithContext : callbacksWithContext) {
         try {
           callbackWithContext.second(playerIdWithListeners, messageQueueForPlayerId.front());
-        } catch (std::exception error) {
+        } catch (std::exception &error) {
           // TODO: Logger
           std::cerr << "Error while calling callback:" << error.what() << std::endl;
         }

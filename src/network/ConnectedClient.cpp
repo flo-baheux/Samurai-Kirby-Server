@@ -41,10 +41,10 @@ void ConnectedClient::receiveFromNetwork() {
     std::string message(buffer, bytesRead);
     try {
       messageBroker.publishPlayerActionMessage(id, Serializer::deserializePlayerActionMessage(message));
-    } catch (DeserializeNotHandledException notHandledException) {
+    } catch (DeserializeNotHandledException &notHandledException) {
       // TODO: Logger
       return;
-    } catch (DeserializeException deserializeException) {
+    } catch (DeserializeException &deserializeException) {
       // TODO: Logger
       return;
     }
@@ -78,7 +78,7 @@ void ConnectedClient::handleGameplayMessage(std::shared_ptr<GameplayMessage> mes
   if (!isDisconnected()) {
     try {
       clientSocket->send(Serializer::serializeGameplayMessage(*message));
-    } catch (SerializeNotHandledException notHandledException) {
+    } catch (SerializeNotHandledException &notHandledException) {
       // TODO: Logger
       return;
     }

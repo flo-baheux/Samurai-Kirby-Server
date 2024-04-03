@@ -23,7 +23,7 @@ const std::shared_ptr<PlayerActionMessage> Serializer::deserializePlayerActionMe
       default:
         throw DeserializeNotHandledException();
     }
-  } catch (json::exception e) {
+  } catch (json::exception &e) {
     throw DeserializeException(e);
   }
 }

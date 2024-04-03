@@ -33,7 +33,7 @@ const std::string Serializer::serializeGameplayMessage(const GameplayMessage &me
       default:
         throw SerializeNotHandledException();
     }
-  } catch (json::exception e) {
+  } catch (json::exception &e) {
     throw SerializeException(e);
   }
 };

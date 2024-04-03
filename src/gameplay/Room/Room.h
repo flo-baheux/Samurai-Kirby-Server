@@ -33,17 +33,16 @@ public:
     const int onePlayerInputOnlyTimeout;
   };
 
-  explicit Room(GameplayMessageBroker &messageBroker, RoomConfig config = {}) : messageBroker{messageBroker}, config{config} {};
+  explicit Room(GameplayMessageBroker &messageBroker, RoomConfig config = {}) : config{config}, messageBroker{messageBroker} {};
   ~Room() {};
   Room(const Room &) = delete;
   Room &operator=(const Room &) = delete;
 
-
   void addPlayer(int playerId, std::string nickname);
   void removePlayer(int playerId);
   bool hasPlayerWithId(int playerId);
-  bool const isFull() const;
-  bool const isEmpty() const;
+  bool isFull() const;
+  bool isEmpty() const;
   void tick();
 
   RoomConfig config;
@@ -79,19 +78,19 @@ private:
   void handlePlayerSetReplayReadyStateMessage(Player *player, std::shared_ptr<SetReplayReadyStatePlayerActionMessage> message);
   void handlePlayerLeaveGameMessage(Player *player, std::shared_ptr<LeaveGamePlayerActionMessage> message);
 
-  inline bool isEveryoneReady() const;
-  inline bool everyoneCanPlay() const;
-  inline bool everyonePlayed() const;
-  inline bool noOnePlayed() const;
-  inline bool everyoneWantsToReplay() const;
+  bool isEveryoneReady() const;
+  bool everyoneCanPlay() const;
+  bool everyonePlayed() const;
+  bool noOnePlayed() const;
+  bool everyoneWantsToReplay() const;
 
   std::optional<Player *> getPlayerByAssignment(PlayerAssignment assignment);
   std::optional<Player *> getPlayerById(int id);
-  const bool isAssignmentUsed(const PlayerAssignment assignment) const;
-  const std::optional<const PlayerAssignment> getAvailableAssignment() const;
+  bool isAssignmentUsed(const PlayerAssignment assignment) const;
+  std::optional<const PlayerAssignment> getAvailableAssignment() const;
 
   void broadcastGameplayMessage(std::shared_ptr<GameplayMessage> message) const;
-  const GameplayInput getRandomGameplayInput() const;
+  GameplayInput getRandomGameplayInput() const;
 
-  const GameResultDTO buildGameResultDTO(std::optional<PlayerAssignment> = std::nullopt) const;
+  GameResultDTO buildGameResultDTO(std::optional<PlayerAssignment> = std::nullopt) const;
 };
