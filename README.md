@@ -1,5 +1,5 @@
 # Samurai-Kirby-Server
-Dedicated game server for the game Samurai Kirby [available on itch.io](https://laywelin.itch.io/samurai-kirby?password=Laywelin-42!)
+Dedicated game server for the game Samurai Kirby [available on itch.io](https://laywelin.itch.io/samurai-kirby?password=Laywelin-42)
 
 
 ## What is Samurai Kirby
